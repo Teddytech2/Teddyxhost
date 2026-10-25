@@ -1,0 +1,1004 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: JuneXDeployment API — Discord bot hosting platform
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Authentication
+  - name: templates
+    description: Bot templates
+  - name: deployments
+    description: Bot deployments
+  - name: admin
+    description: Admin operations
+  - name: dashboard
+    description: Dashboard summary
+  - name: payments
+    description: Paystack payment operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterInput"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /templates:
+    get:
+      operationId: listTemplates
+      tags: [templates]
+      summary: List all bot templates
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Template"
+    post:
+      operationId: createTemplate
+      tags: [templates]
+      summary: Create a new template (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TemplateInput"
+      responses:
+        "201":
+          description: Template created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Template"
+
+  /templates/categories:
+    get:
+      operationId: listTemplateCategories
+      tags: [templates]
+      summary: List distinct template categories
+      responses:
+        "200":
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /templates/{id}:
+    get:
+      operationId: getTemplate
+      tags: [templates]
+      summary: Get a single template
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Template
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Template"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateTemplate
+      tags: [templates]
+      summary: Update a template (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TemplateUpdate"
+      responses:
+        "200":
+          description: Template updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Template"
+    delete:
+      operationId: deleteTemplate
+      tags: [templates]
+      summary: Delete a template (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /deployments:
+    get:
+      operationId: listDeployments
+      tags: [deployments]
+      summary: List current user's deployments
+      responses:
+        "200":
+          description: List of deployments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Deployment"
+    post:
+      operationId: createDeployment
+      tags: [deployments]
+      summary: Create and deploy a bot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeploymentInput"
+      responses:
+        "201":
+          description: Deployment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deployment"
+
+  /deployments/{id}:
+    get:
+      operationId: getDeployment
+      tags: [deployments]
+      summary: Get a deployment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deployment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deployment"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteDeployment
+      tags: [deployments]
+      summary: Delete a deployment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /deployments/{id}/start:
+    post:
+      operationId: startDeployment
+      tags: [deployments]
+      summary: Start a stopped deployment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deployment"
+
+  /deployments/{id}/stop:
+    post:
+      operationId: stopDeployment
+      tags: [deployments]
+      summary: Stop a running deployment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Stopped
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deployment"
+
+  /deployments/{id}/restart:
+    post:
+      operationId: restartDeployment
+      tags: [deployments]
+      summary: Restart a deployment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Restarted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deployment"
+
+  /deployments/{id}/logs:
+    get:
+      operationId: getDeploymentLogs
+      tags: [deployments]
+      summary: Get logs for a deployment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Logs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeploymentLogs"
+
+  /deployments/{id}/env:
+    patch:
+      operationId: updateDeploymentEnv
+      tags: [deployments]
+      summary: Update environment variables for a deployment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnvVarsUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deployment"
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get user dashboard summary stats
+      responses:
+        "200":
+          description: Summary stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Get platform-wide admin stats
+      responses:
+        "200":
+          description: Admin stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+
+  /admin/users:
+    get:
+      operationId: listAdminUsers
+      tags: [admin]
+      summary: List all users (admin only)
+      responses:
+        "200":
+          description: Users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /admin/users/{id}/role:
+    patch:
+      operationId: updateAdminUserRole
+      tags: [admin]
+      summary: Update a user role (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role:
+                  type: string
+                  enum: [user, admin]
+      responses:
+        "200":
+          description: Updated account role
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, username, email, role]
+                properties:
+                  id:
+                    type: integer
+                  username:
+                    type: string
+                  email:
+                    type: string
+                  role:
+                    type: string
+                    enum: [user, admin]
+        "400":
+          description: Invalid role or request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Admin access required
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: At least one admin must remain
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/deployments:
+    get:
+      operationId: listAdminDeployments
+      tags: [admin]
+      summary: List all deployments (admin only)
+      responses:
+        "200":
+          description: All deployments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Deployment"
+
+  /admin/fetch-app-json:
+    post:
+      operationId: fetchAppJson
+      tags: [admin]
+      summary: Fetch and parse app.json from a GitHub repo URL (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FetchAppJsonInput"
+      responses:
+        "200":
+          description: Parsed app.json data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppJsonResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/deployments/{id}/suspend:
+    post:
+      operationId: suspendDeployment
+      tags: [admin]
+      summary: Suspend a deployment (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deployment"
+
+  /payments/initiate:
+    post:
+      operationId: initiatePayment
+      tags: [payments]
+      summary: Initiate a Paystack card payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentInitiateInput"
+      responses:
+        "200":
+          description: Payment initiated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentInitiateResponse"
+
+  /payments/stk-push:
+    post:
+      operationId: stkPush
+      tags: [payments]
+      summary: M-Pesa STK push via Paystack
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StkPushInput"
+      responses:
+        "200":
+          description: STK push sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MpesaPushResult"
+
+  /payments/verify/{reference}:
+    get:
+      operationId: verifyPayment
+      tags: [payments]
+      summary: Verify a Paystack payment
+      parameters:
+        - name: reference
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payment status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentVerifyResponse"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    SuccessResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+
+    User:
+      type: object
+      required: [id, username, email, role, createdAt]
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [user, admin]
+        createdAt:
+          type: string
+
+    AuthResponse:
+      type: object
+      required: [user, token]
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+
+    RegisterInput:
+      type: object
+      required: [username, email, password]
+      properties:
+        username:
+          type: string
+          minLength: 3
+        email:
+          type: string
+        password:
+          type: string
+          minLength: 6
+
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    Template:
+      type: object
+      required: [id, name, slug, description, githubRepo, category, appJson, isFree, isFeatured, showDeployCount, price, currency, pairSiteUrl, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        githubRepo:
+          type: string
+        thumbnail:
+          type: ["string", "null"]
+        category:
+          type: string
+        appJson:
+          type: object
+        isFree:
+          type: boolean
+        isFeatured:
+          type: boolean
+        showDeployCount:
+          type: boolean
+        price:
+          type: integer
+        currency:
+          type: string
+        pairSiteUrl:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        deployCount:
+          type: integer
+
+    TemplateInput:
+      type: object
+      required: [name, description, githubRepo, category, appJson]
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        githubRepo:
+          type: string
+        thumbnail:
+          type: ["string", "null"]
+        category:
+          type: string
+        appJson:
+          type: object
+        isFree:
+          type: boolean
+        isFeatured:
+          type: boolean
+        showDeployCount:
+          type: boolean
+        price:
+          type: integer
+        currency:
+          type: string
+        pairSiteUrl:
+          type: ["string", "null"]
+
+    TemplateUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        githubRepo:
+          type: string
+        thumbnail:
+          type: ["string", "null"]
+        category:
+          type: string
+        appJson:
+          type: object
+        isFree:
+          type: boolean
+        isFeatured:
+          type: boolean
+        showDeployCount:
+          type: boolean
+        price:
+          type: integer
+        currency:
+          type: string
+        pairSiteUrl:
+          type: ["string", "null"]
+
+    Deployment:
+      type: object
+      required: [id, userId, templateId, templateName, botName, status, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        templateId:
+          type: integer
+        templateName:
+          type: string
+        botName:
+          type: string
+        herokuAppId:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [queued, building, online, offline, error, failed, suspended]
+        failedAt:
+          type: [string, "null"]
+        failureReason:
+          type: [string, "null"]
+        herokuDeletedAt:
+          type: [string, "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        templateThumbnail:
+          type: ["string", "null"]
+        envVars:
+          type: object
+          additionalProperties:
+            type: string
+        databaseUrl:
+          type: [string, "null"]
+
+    DeploymentInput:
+      type: object
+      required: [templateId, botName, envVars]
+      properties:
+        templateId:
+          type: integer
+        botName:
+          type: string
+        envVars:
+          type: object
+          additionalProperties:
+            type: string
+
+    DeploymentLogs:
+      type: object
+      required: [lines]
+      properties:
+        lines:
+          type: array
+          items:
+            type: string
+
+    EnvVarsUpdate:
+      type: object
+      required: [envVars]
+      properties:
+        envVars:
+          type: object
+          additionalProperties:
+            type: string
+
+    DashboardSummary:
+      type: object
+      required: [totalDeployments, onlineCount, offlineCount, errorCount, recentDeployments]
+      properties:
+        totalDeployments:
+          type: integer
+        onlineCount:
+          type: integer
+        offlineCount:
+          type: integer
+        errorCount:
+          type: integer
+        recentDeployments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Deployment"
+
+    AdminStats:
+      type: object
+      required: [totalUsers, totalDeployments, onlineDeployments, totalTemplates]
+      properties:
+        totalUsers:
+          type: integer
+        totalDeployments:
+          type: integer
+        onlineDeployments:
+          type: integer
+        totalTemplates:
+          type: integer
+
+    FetchAppJsonInput:
+      type: object
+      required: [repoUrl]
+      properties:
+        repoUrl:
+          type: string
+
+    AppJsonResult:
+      type: object
+      required: [name, raw]
+      properties:
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        logo:
+          type: ["string", "null"]
+        keywords:
+          type: array
+          items:
+            type: string
+        env:
+          type: object
+          additionalProperties:
+            type: object
+        raw:
+          type: object
+
+    PaymentInitiateInput:
+      type: object
+      required: [templateId]
+      properties:
+        templateId:
+          type: integer
+        currency:
+          type: string
+          description: >
+            Optional hint only; the server always charges the template's own
+            currency. NGN is paid in kobo via card, bank transfer or USSD;
+            KES in cents via card (M-Pesa has its own stk-push endpoint).
+          enum: [NGN, KES]
+        callbackUrl:
+          type: string
+
+    PaymentInitiateResponse:
+      type: object
+      required: [authorizationUrl, reference, accessCode]
+      properties:
+        authorizationUrl:
+          type: string
+        reference:
+          type: string
+        accessCode:
+          type: string
+        amount:
+          type: integer
+        currency:
+          type: string
+          enum: [NGN, KES]
+        channels:
+          type: array
+          items:
+            type: string
+        templateName:
+          type: string
+
+    StkPushInput:
+      type: object
+      required: [phone, amount, email]
+      properties:
+        phone:
+          type: string
+        amount:
+          type: integer
+        email:
+          type: string
+        planType:
+          type: string
+
+    MpesaPushResult:
+      type: object
+      required: [status, reference]
+      properties:
+        status:
+          type: string
+        reference:
+          type: string
+        message:
+          type: string
+
+    PaymentVerifyResponse:
+      type: object
+      required: [status, reference]
+      properties:
+        status:
+          type: string
+        reference:
+          type: string
+        amount:
+          type: integer
+        currency:
+          type: string
+          enum: [NGN, KES]
+        channel:
+          type: [string, "null"]
+          description: Paystack charge channel (card, bank_transfer, ussd, mpesa, ...)
+        email:
+          type: string
+        paidAt:
+          type: ["string", "null"]
+        unlocked:
+          type: boolean

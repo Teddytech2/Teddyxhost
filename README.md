@@ -1,2 +1,1 @@
-# Teddyxhost
-Uploaded using Teddyxcloud
+# June-hosts
