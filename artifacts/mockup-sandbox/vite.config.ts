@@ -5,11 +5,14 @@ import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import { mockupPreviewPlugin } from "./mockupPreviewPlugin";
 
-// Safe defaults for Vercel builds when PORT or BASE_PATH is not configured.
+// Use a safe default when PORT is not provided during a Vercel build.
 const rawPort = process.env.PORT || "5000";
 const parsedPort = Number(rawPort);
+
 const port =
-  Number.isInteger(parsedPort) && parsedPort > 0 ? parsedPort : 5000;
+  Number.isInteger(parsedPort) && parsedPort > 0
+    ? parsedPort
+    : 5000;
 
 const basePath = process.env.BASE_PATH || "/";
 
