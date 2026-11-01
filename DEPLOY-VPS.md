@@ -1,10 +1,10 @@
 # Deploying June-hosts on a VPS
 
-End-to-end: Ubuntu 24.04 VPS → Postgres → Node 24 → this monorepo → nginx + TLS.
+End-to-end: Ubuntu 24.04 VPS → MongoDB → Node 24 → this monorepo → nginx + TLS.
 The API server also serves the built frontend, so one process runs everything.
 
 Verified flow (schema push, boot, `/api/healthz`, static frontend) against a
-fresh Postgres — follow in order.
+fresh MongoDB — follow in order.
 
 ---
 
@@ -15,7 +15,7 @@ fresh Postgres — follow in order.
 | VPS | Ubuntu 22.04/24.04, 1 vCPU / 1 GB RAM is enough to start |
 | Node.js | **24.x** (the repo enforces `>=24 <25`) |
 | pnpm | 11.x (`corepack` picks the exact version from `packageManager`) |
-| PostgreSQL | 14+ (16 recommended) — local or managed (Neon, Supabase, RDS…) |
+| MongoDB Atlas | 14+ (16 recommended) — local or managed (Neon, Supabase, RDS…) |
 | Domain | A record pointing at the VPS IP (for TLS + OAuth + Paystack) |
 
 ---
@@ -40,7 +40,7 @@ node -v   # v24.x
 pnpm -v   # 11.15.0
 ```
 
-## 3. PostgreSQL (skip if you use a managed DB)
+## 3. MongoDB Atlas (skip if you use a managed DB)
 
 ```bash
 sudo apt install -y postgresql
@@ -50,7 +50,7 @@ CREATE DATABASE junex OWNER junex;
 SQL
 ```
 
-Your `DATABASE_URL` becomes
+Your `MONGODB_URI` becomes
 `postgres://junex:CHANGE_ME_STRONG@127.0.0.1:5432/junex`.
 
 ## 4. App install
@@ -60,7 +60,7 @@ git clone https://github.com/eminentboy11/June-hosts.git /opt/junex
 cd /opt/junex
 
 cp .env.example .env
-nano .env          # fill in DATABASE_URL, SESSION_SECRET, PAYSTACK_SECRET_KEY, …
+nano .env          # fill in MONGODB_URI, SESSION_SECRET, PAYSTACK_SECRET_KEY, …
 
 pnpm install --frozen-lockfile
 pnpm run build                     # typecheck + frontend + api-server
@@ -172,7 +172,7 @@ sudo systemctl restart junex
 
 ## 9. Backups
 
-Nightly Postgres dump, keep 7 days:
+Nightly MongoDB dump, keep 7 days:
 
 ```bash
 sudo crontab -e
@@ -188,7 +188,7 @@ sudo crontab -e
 |---|---|
 | `PORT environment variable is required` | `.env` not loaded — start via systemd (`EnvironmentFile`) or `set -a; source .env` |
 | `SESSION_SECRET must be set in production` | fill `SESSION_SECRET` in `.env` |
-| `DATABASE_URL, ensure the database is provisioned` | DB step 3 not done, or wrong URL |
-| Boot loops at `loadSettingsFromDb` | Postgres not reachable from the VPS (check `pg_hba.conf` / firewall / managed-DB allowlist) |
+| `MONGODB_URI, ensure the database is provisioned` | DB step 3 not done, or wrong URL |
+| Boot loops at `loadSettingsFromDb` | MongoDB not reachable from the VPS (check `pg_hba.conf` / firewall / managed-DB allowlist) |
 | OAuth redirect mismatch | callback URL must be exactly `https://yourdomain.com/api/auth/{google,github}/callback` |
 | Paystack webhook 401 in logs | signature check working as designed — make sure the dashboard webhook secret/URL is right and the body is not being proxied/re-encoded |

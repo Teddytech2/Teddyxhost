@@ -2,7 +2,7 @@ import { Router, type IRouter } from "express";
 import { requireAuth } from "../lib/auth";
 import { logger } from "../lib/logger";
 import { db, paymentsTable, templatesTable } from "@workspace/db";
-import { eq, and } from "drizzle-orm";
+import { eq, and } from "@workspace/db";
 import {
   PAYSTACK_BASE,
   paystackHeaders,
@@ -98,7 +98,7 @@ router.post("/payments/initiate", requireAuth, async (req, res): Promise<void> =
         currency: useCurrency,
         reference,
         channels: PAYSTACK_CHANNELS[useCurrency],
-        callback_url: callbackUrl ?? `${process.env.FRONTEND_URL ?? process.env.RENDER_EXTERNAL_URL ?? "http://localhost:5000"}/payment-callback`,
+        callback_url: callbackUrl ?? `${(process.env.FRONTEND_URL || process.env.RENDER_EXTERNAL_URL || `${req.protocol}://${req.get("host")}`).replace(/\/$/, "")}/payment-callback`,
         metadata: { templateId: template.id, templateName: template.name },
       }),
     });

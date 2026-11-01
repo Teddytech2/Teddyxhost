@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { type Request, type Response, type NextFunction } from "express";
 import { db, usersTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { eq } from "@workspace/db";
 
 const JWT_SECRET = process.env.SESSION_SECRET ?? "junexdeployment-secret";
 

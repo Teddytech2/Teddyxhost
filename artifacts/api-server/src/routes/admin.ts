@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, deploymentsTable, templatesTable, usersTable, paymentsTable, walletTransactionsTable, coinTransactionsTable } from "@workspace/db";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql } from "@workspace/db";
 import { requireAdmin } from "../lib/auth";
 import { logger } from "../lib/logger";
 import { getSetting, setSetting } from "../lib/settings";

@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { OAuthButtons } from "@/components/oauth-buttons";
 import { Terminal } from "lucide-react";
 
 const loginSchema = z.object({
@@ -59,14 +58,13 @@ export default function Login() {
           </CardHeader>
 
           <CardContent className="space-y-4">
-            <OAuthButtons />
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">Or with email</span>
+                <span className="bg-card px-2 text-muted-foreground">Email and password</span>
               </div>
             </div>
 

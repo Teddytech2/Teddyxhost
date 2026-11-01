@@ -18,7 +18,7 @@ const sections = [
       },
       {
         heading: "Create an Account",
-        body: "Sign up at /register using your email or continue with Google or GitHub. The first thing you should do after signing up is top up your wallet so you can deploy bots.",
+        body: "Sign up at /register using your email and password. The first thing you should do after signing up is top up your wallet so you can deploy bots.",
       },
       {
         heading: "Top Up Your Wallet",

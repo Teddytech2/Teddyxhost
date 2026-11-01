@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, deploymentsTable, templatesTable, usersTable, coinTransactionsTable } from "@workspace/db";
-import { eq, and, isNull, isNotNull, gte, lte, or, sql } from "drizzle-orm";
+import { eq, and, isNull, isNotNull, gte, lte, or, sql } from "@workspace/db";
 import { requireAuth } from "../lib/auth";
 import { logger } from "../lib/logger";
 import { getSetting } from "../lib/settings";

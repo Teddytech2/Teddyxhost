@@ -17,7 +17,6 @@ import DeploymentDetail from "@/pages/deployment-detail";
 import AdminDashboard from "@/pages/admin-dashboard";
 import AdminTemplateNew from "@/pages/admin-template-new";
 import AdminDevelopersPage from "@/pages/admin-developers";
-import OAuthCallback from "@/pages/oauth-callback";
 import WalletPage from "@/pages/wallet";
 import MyBotsPage from "@/pages/my-bots";
 import DocsPage from "@/pages/docs";
@@ -41,7 +40,6 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
-      <Route path="/oauth-callback" component={OAuthCallback} />
       <Route path="/docs" component={DocsPage} />
       <Route path="/integration" component={IntegrationPage} />
       <Route path="/privacy" component={PrivacyPage} />

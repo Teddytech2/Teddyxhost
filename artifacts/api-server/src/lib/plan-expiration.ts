@@ -1,4 +1,4 @@
-import { and, eq, isNull, lte } from "drizzle-orm";
+import { and, eq, isNull, lte } from "@workspace/db";
 import { db, deploymentsTable } from "@workspace/db";
 import { getSetting } from "./settings";
 import { logger } from "./logger";

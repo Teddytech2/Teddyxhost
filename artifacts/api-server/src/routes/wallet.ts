@@ -2,12 +2,11 @@ import { Router, type IRouter } from "express";
 import { requireAuth } from "../lib/auth";
 import { logger } from "../lib/logger";
 import { db, usersTable, walletTransactionsTable, templatesTable, coinTransactionsTable } from "@workspace/db";
-import { eq, desc, sql, and } from "drizzle-orm";
+import { eq, desc, sql, and } from "@workspace/db";
 import { getKesPerCoin, getNgnPerCoin, getMinimumDepositAmountMinor, minorToCoins, pegForCurrency, walletCurrencyForCountry } from "../lib/plans";
 import { verifyPaystackSignature, getRawBody, headerValue, gatewayConfigured, paystackHeaders, PAYSTACK_BASE } from "../lib/paystack";
 
 const router: IRouter = Router();
-const FRONTEND_URL = process.env.FRONTEND_URL ?? process.env.RENDER_EXTERNAL_URL ?? "http://localhost:5000";
 
 function generateReference() {
   return `WALLET-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
@@ -104,7 +103,7 @@ router.post("/wallet/deposit/card", requireAuth, async (req, res): Promise<void>
       body: JSON.stringify({
         email: user.email, amount, currency: useCurrency, reference,
         channels: useCurrency === "KES" ? ["card"] : ["card", "bank_transfer", "ussd"],
-        callback_url: `${FRONTEND_URL}/wallet`,
+        callback_url: `${(process.env.FRONTEND_URL || process.env.RENDER_EXTERNAL_URL || `${req.protocol}://${req.get("host")}`).replace(/\/$/, "")}/wallet`,
         metadata: { type: "wallet_deposit", userId: user.id },
       }),
     });

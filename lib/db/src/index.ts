@@ -1,16 +1,4 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
-import * as schema from "./schema";
-
-const { Pool } = pg;
-
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
-}
-
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle(pool, { schema });
-
+// MongoDB-backed persistence. Schema objects remain as field metadata and Zod
+// validation/type definitions; all runtime reads and writes go to MongoDB Atlas.
+export { db, closeMongo, eq, ne, and, or, gte, lte, gt, lt, isNull, isNotNull, inArray, ilike, desc, asc, sql } from "./mongo";
 export * from "./schema";

@@ -8,8 +8,7 @@ import router from "./routes";
 import { logger } from "./lib/logger";
 
 const app: Express = express();
-const renderOrigin = process.env.RENDER_EXTERNAL_URL;
-const allowedOrigins = (process.env.FRONTEND_URL ?? renderOrigin ?? "http://localhost:5000")
+const allowedOrigins = (process.env.FRONTEND_URL ?? process.env.RENDER_EXTERNAL_URL ?? "")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
@@ -37,7 +36,11 @@ app.use(
     },
   }),
 );
-app.use(cors({ origin: allowedOrigins }));
+// If frontend and API are served by this same Heroku app, no CORS allowlist is
+// needed. Only enable cross-origin access when FRONTEND_URL is explicitly set.
+app.use(cors(allowedOrigins.length
+  ? { origin: allowedOrigins }
+  : { origin: false }));
 // Paystack webhooks are verified against the RAW body (HMAC-SHA512), so they
 // must be captured as Buffers before the JSON parser consumes the stream.
 app.use("/api/payments/webhook", express.raw({ type: "*/*", limit: "1mb" }));

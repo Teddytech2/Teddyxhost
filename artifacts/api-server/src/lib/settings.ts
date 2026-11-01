@@ -1,5 +1,5 @@
 import { db, settingsTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { eq } from "@workspace/db";
 
 const settings = new Map<string, string>();
 let settingsTableAvailable = true;
