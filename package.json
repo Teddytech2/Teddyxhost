@@ -8,6 +8,7 @@
 },
 "private": true,
 "scripts": {
+"start": "pnpm --filter @workspace/api-server start",
 "build": "pnpm run typecheck && pnpm --filter @workspace/junex build && pnpm --filter @workspace/api-server build",
 "typecheck:libs": "tsc --build",
 "typecheck": "pnpm run typecheck:libs && pnpm -r --filter './artifacts/**' --filter './scripts' --if-present run typecheck"
