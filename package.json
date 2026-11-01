@@ -8,7 +8,6 @@
 },
 "scripts": {
 "preinstall": "node -e "if(!process.env.npm_config_user_agent||!process.env.npm_config_user_agent.startsWith('pnpm/')){console.error('Use pnpm instead');process.exit(1)}"",
-"start": "pnpm --filter @workspace/api-server start",
 "build": "pnpm run typecheck && pnpm --filter @workspace/junex build && pnpm --filter @workspace/api-server build",
 "typecheck:libs": "tsc --build",
 "typecheck": "pnpm run typecheck:libs && pnpm -r --filter "./artifacts/**" --filter "./scripts" --if-present run typecheck"
